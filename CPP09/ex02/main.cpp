@@ -10,21 +10,16 @@ int main(int argc, char** argv)
     if (sorter.processInput(argc, argv))
         return 1;
 
-    std::vector<int> vec = sorter.getVector();
-    std::list<int> lst = sorter.getList();
+    std::vector<int>& vec = sorter.getVector();  // Fix: use reference
+    std::list<int>& lst = sorter.getList();
 
-    clock_t sortVecStart = std::clock();
-    sorter.performMergeSortVector(vec); // includes timing for sorting vector
-    clock_t sortVecEnd = std::clock();
+    sorter.performMergeSortVector(vec); // sorting + timing inside
+    clock_t sortVecEnd = std::clock();  // Marks end of vector sorting
 
-    clock_t sortListStart = std::clock();
-    sorter.performMergeSortList(lst);   // includes timing for sorting list
-    clock_t sortListEnd = std::clock();
-
-    clock_t totalEnd = std::clock();    // END total timing
+    sorter.performMergeSortList(lst);   // sorting + timing inside
+    clock_t totalEnd = std::clock();    // END of everything
 
     // Total durations (input + sort) in microseconds
-    double totalDuration = double(totalEnd - totalStart) * 1000000.0 / CLOCKS_PER_SEC;
     double totalVecDuration = double(sortVecEnd - totalStart) * 1000000.0 / CLOCKS_PER_SEC;
     double totalListDuration = double(totalEnd - sortVecEnd) * 1000000.0 / CLOCKS_PER_SEC;
 
@@ -33,3 +28,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
+
