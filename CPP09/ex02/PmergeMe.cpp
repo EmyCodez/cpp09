@@ -168,24 +168,14 @@ void PmergeMe::fordJohnsonList(std::list<int>& data)
     data = mainChain;
 }
 
-void PmergeMe::performMergeSortVector(std::vector<int>& vec)
-{
-    fordJohnsonVector(vec);
-}
-
-void PmergeMe::performMergeSortList(std::list<int>& lst)
-{
-    fordJohnsonList(lst);
-}
-
 void PmergeMe::sortVector()
 {
-    performMergeSortVector(vecNumbers);
+    fordJohnsonVector(vecNumbers);
 }
 
 void PmergeMe::sortList()
 {
-    performMergeSortList(lstNumbers);
+    fordJohnsonList(lstNumbers);
 }
 
 const std::vector<int>& PmergeMe::getVector() const
