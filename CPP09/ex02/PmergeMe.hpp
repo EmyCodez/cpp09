@@ -7,7 +7,6 @@
 #include <list>
 #include <algorithm>
 #include <set>
-#include <ctime>  // For timing
 #include <cstdlib> // For atoi
 
 #define MAX_LIMIT 3000
@@ -17,8 +16,6 @@ class PmergeMe
 private:
     std::vector<int> vecNumbers;
     std::list<int> lstNumbers;
-    double vectorDuration;  // microseconds
-    double listDuration;    // microseconds
 
     // Sorting helpers
     void fordJohnsonVector(std::vector<int>& data);
@@ -35,14 +32,15 @@ public:
 
     void performMergeSortVector(std::vector<int>& vec);
     void performMergeSortList(std::list<int>& lst);
+    void sortVector(); 
+    void sortList();   
 
     void printVector(const std::string& word);
     void printList();
 
-    // Accessors
-    std::vector<int>& getVector();
-    std::list<int>& getList();
+    // Accessors 
+    const std::vector<int>& getVector() const;
+    const std::list<int>& getList() const;
 };
 
 #endif
-

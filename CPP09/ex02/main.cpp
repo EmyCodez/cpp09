@@ -1,31 +1,59 @@
 #include "PmergeMe.hpp"
-#include <ctime>
 #include <iostream>
+#include <iomanip>
+#include <sys/time.h>
+
+double getElapsedTimeMicroseconds(const timeval& start, const timeval& end) {
+    return static_cast<double>((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec));
+}
 
 int main(int argc, char** argv)
 {
-    clock_t totalStart = std::clock();  // START total timing
-
     PmergeMe sorter;
-    if (sorter.processInput(argc, argv))
+
+    // ---------- Time input parsing ----------
+    struct timeval inputStart, inputEnd;
+    gettimeofday(&inputStart, NULL);
+    if (sorter.processInput(argc, argv)) {
         return 1;
+    }
+    gettimeofday(&inputEnd, NULL);
 
-    std::vector<int>& vec = sorter.getVector();  // Fix: use reference
-    std::list<int>& lst = sorter.getList();
+    double inputTime = getElapsedTimeMicroseconds(inputStart, inputEnd);
 
-    sorter.performMergeSortVector(vec); // sorting + timing inside
-    clock_t sortVecEnd = std::clock();  // Marks end of vector sorting
+    const std::vector<int>& vec = sorter.getVector();
+    const std::list<int>& lst = sorter.getList();
 
-    sorter.performMergeSortList(lst);   // sorting + timing inside
-    clock_t totalEnd = std::clock();    // END of everything
+    sorter.printVector("Before: ");
 
-    // Total durations (input + sort) in microseconds
-    double totalVecDuration = double(sortVecEnd - totalStart) * 1000000.0 / CLOCKS_PER_SEC;
-    double totalListDuration = double(totalEnd - sortVecEnd) * 1000000.0 / CLOCKS_PER_SEC;
+    // ---------- Time vector sort ----------
+    struct timeval vecStart, vecEnd;
+    gettimeofday(&vecStart, NULL);
+    sorter.sortVector();
+    gettimeofday(&vecEnd, NULL);
 
-    std::cout << "Total time for std::vector operations: " << totalVecDuration << " us" << std::endl;
-    std::cout << "Total time for std::list operations: "   << totalListDuration << " us" << std::endl;
+    double vecSortTime = getElapsedTimeMicroseconds(vecStart, vecEnd);
+    double totalVecTime = inputTime + vecSortTime;
+
+    sorter.printVector("After: ");
+
+    // ---------- Time list sort ----------
+    struct timeval listStart, listEnd;
+    gettimeofday(&listStart, NULL);
+    sorter.sortList();
+    gettimeofday(&listEnd, NULL);
+
+    double listSortTime = getElapsedTimeMicroseconds(listStart, listEnd);
+    double totalListTime = inputTime + listSortTime;
+
+    // ---------- Output timings ----------
+    std::cout << "Time to process a range of " << vec.size()
+          << " elements with std::vector : "
+          << std::fixed << std::setprecision(4) << totalVecTime << " us" << std::endl;
+
+    std::cout << "Time to process a range of " << lst.size()
+              << " elements with std::list   : " 
+              << std::fixed << std::setprecision(4) << totalListTime << " us" << std::endl;
 
     return 0;
 }
-

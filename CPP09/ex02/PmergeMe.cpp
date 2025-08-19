@@ -1,6 +1,6 @@
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe() : vectorDuration(0), listDuration(0) {}
+PmergeMe::PmergeMe() {}
 
 PmergeMe::PmergeMe(const PmergeMe &other) { *this = other; }
 
@@ -9,8 +9,6 @@ PmergeMe& PmergeMe::operator=(const PmergeMe &other)
     if (this != &other) {
         vecNumbers = other.vecNumbers;
         lstNumbers = other.lstNumbers;
-        vectorDuration = other.vectorDuration;
-        listDuration = other.listDuration;
     }
     return *this;
 }
@@ -172,33 +170,30 @@ void PmergeMe::fordJohnsonList(std::list<int>& data)
 
 void PmergeMe::performMergeSortVector(std::vector<int>& vec)
 {
-    printVector("Before: ");
-    clock_t start = std::clock();
     fordJohnsonVector(vec);
-    clock_t end = std::clock();
-    vectorDuration = double(end - start) * 1000000.0 / CLOCKS_PER_SEC;
-    printVector("After: ");
-    std::cout << "Time to process a range of " << vec.size()
-        << " elements with std::vector : " << vectorDuration << " us" << std::endl;
 }
 
 void PmergeMe::performMergeSortList(std::list<int>& lst)
 {
-    clock_t start = std::clock();
     fordJohnsonList(lst);
-    clock_t end = std::clock();
-    listDuration = double(end - start) * 1000000.0 / CLOCKS_PER_SEC;
-    std::cout << "Time to process a range of " << lst.size()
-        << " elements with std::list : " << listDuration << " us" << std::endl;
 }
 
-std::vector<int>& PmergeMe::getVector()
+void PmergeMe::sortVector()
+{
+    performMergeSortVector(vecNumbers);
+}
+
+void PmergeMe::sortList()
+{
+    performMergeSortList(lstNumbers);
+}
+
+const std::vector<int>& PmergeMe::getVector() const
 {
     return vecNumbers;
 }
 
-std::list<int>& PmergeMe::getList()
+const std::list<int>& PmergeMe::getList() const
 {
     return lstNumbers;
 }
-

@@ -5,6 +5,18 @@
 #include <cstdlib>
 
 BitcoinExchange::BitcoinExchange() {}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &other) {
+    this->prices = other.prices;
+}
+
+BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other) {
+    if (this != &other) {
+        this->prices = other.prices;
+    }
+    return *this;
+}
+
 BitcoinExchange::~BitcoinExchange() {}
 
 void BitcoinExchange::loadDatabase(const std::string& filename) {
@@ -98,7 +110,7 @@ bool BitcoinExchange::validateValue(const std::string& str, double& outValue) co
         std::cerr << "Error: bad input => " << str << "\n";
         return false;
     }
-    if (outValue < 0) {
+    if (outValue <= 0) {
         std::cerr << "Error: not a positive number.\n";
         return false;
     }
