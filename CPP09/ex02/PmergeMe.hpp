@@ -30,8 +30,6 @@ public:
 
     int processInput(int argc, char** argv);
 
-    void performMergeSortVector(std::vector<int>& vec);
-    void performMergeSortList(std::list<int>& lst);
     void sortVector(); 
     void sortList();   
 
