@@ -17,14 +17,14 @@ int main(int argc, char** argv)
     if (sorter.processInput(argc, argv)) {
         return 1;
     }
-    gettimeofday(&inputEnd, NULL);
-
-    double inputTime = getElapsedTimeMicroseconds(inputStart, inputEnd);
-
+    
     const std::vector<int>& vec = sorter.getVector();
     const std::list<int>& lst = sorter.getList();
 
     sorter.printVector("Before: ");
+    gettimeofday(&inputEnd, NULL);
+
+    double inputTime = getElapsedTimeMicroseconds(inputStart, inputEnd);
 
     // ---------- Time vector sort ----------
     struct timeval vecStart, vecEnd;
@@ -34,8 +34,6 @@ int main(int argc, char** argv)
 
     double vecSortTime = getElapsedTimeMicroseconds(vecStart, vecEnd);
     double totalVecTime = inputTime + vecSortTime;
-
-    sorter.printVector("After: ");
 
     // ---------- Time list sort ----------
     struct timeval listStart, listEnd;
@@ -47,6 +45,7 @@ int main(int argc, char** argv)
     double totalListTime = inputTime + listSortTime;
 
     // ---------- Output timings ----------
+    sorter.printVector("After: ");
     std::cout << "Time to process a range of " << vec.size()
           << " elements with std::vector : "
           << std::fixed << std::setprecision(4) << totalVecTime << " us" << std::endl;
