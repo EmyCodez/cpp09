@@ -52,27 +52,63 @@ void BitcoinExchange::processInputFile(const std::string& filename) const {
     }
 
     std::string line;
+    bool headerSeen = false;
+
     while (std::getline(ifs, line)) {
-        if (line.empty() || line == "date | value")
+        if (line.empty())
             continue;
 
-        std::istringstream iss(line);
-        std::string datePart, valuePart;
-        if (!std::getline(iss, datePart, '|') ||
-            !std::getline(iss, valuePart)) {
+        if (line == "date | value") {
+            if (headerSeen) {
+                std::cerr << "Error: multiple headers detected.\n";
+                continue;
+            }
+            headerSeen = true;
+            continue;
+        }
+
+        std::size_t pipePos = line.find('|');
+        if (pipePos == std::string::npos || line.find('|', pipePos + 1) != std::string::npos) {
             std::cerr << "Error: bad input => " << line << "\n";
             continue;
         }
 
-        // Trim spaces
+        std::string datePart = line.substr(0, pipePos);
+        std::string valuePartAndTrailing = line.substr(pipePos + 1);
+
+        // Trim datePart
         datePart.erase(0, datePart.find_first_not_of(" \t"));
         datePart.erase(datePart.find_last_not_of(" \t") + 1);
+
+        // Trim valuePart from left only
+        std::string valuePart = valuePartAndTrailing;
         valuePart.erase(0, valuePart.find_first_not_of(" \t"));
-        valuePart.erase(valuePart.find_last_not_of(" \t") + 1);
+
+        // Extract only the numeric part of the value
+        std::istringstream valStream(valuePart);
+        std::string numericPart;
+        valStream >> numericPart;
+
+        // Check for unexpected characters after numeric value
+        std::string remainder;
+        std::getline(valStream, remainder);
+
+        bool badInput = false;
+        for (std::size_t i = 0; i < remainder.length(); ++i) {
+            if (remainder[i] != ' ' && remainder[i] != '\t') {
+                std::cerr << "Error: bad input => " << line << "\n";
+                badInput = true;
+                break;
+            }
+        }
+        if (badInput)
+            continue;
 
         double value;
-        if (!validateDate(datePart) || !validateValue(valuePart, value))
+        if (!validateDate(datePart) || !validateValue(numericPart, value)) {
+            std::cerr << "Error: bad input => " << line << "\n";
             continue;
+        }
 
         std::map<std::string, double>::const_iterator it = prices.lower_bound(datePart);
         if (it == prices.end() || it->first != datePart) {
